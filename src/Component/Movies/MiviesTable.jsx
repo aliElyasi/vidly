@@ -1,43 +1,39 @@
 import React, { Component } from 'react'
-import Like from '../Comon/like'
+import Like from '../Common/like'
+import { groupBy } from 'lodash'
+import TableHeader from '../Common/TableHeader'
+import TableBody from '../Common/TableBody'
+import Table from '../Common/Table'
+class MoviesTable extends Component {
+   
+    Columns=[{lable:"Title",path:"title"},
+    {lable:"Genre",path:"genre.name"},{lable:"Stock",path:"numberInStock"},{lable:"Daily RentalRate",path:"dailyRentalRate"},
+    {key:"Delete",content: movie=><button onClick={()=>this.props.onDelete(movie)} className="btn btn-danger">Delete</button>}
+    ,{key:"Like",content:movie=> <Like movie={movie} onLike={this.props.onLike}/>}
+]
 
-const MoviesTable = props => {
-    const {movies,onDelete,onLike}=props
-    console.log(movies)
-    return ( 
-        <table className="table">
-            <thead>
-                <tr>
-                    <th>title</th>
-                    <th>genre</th>
-                    <th>number in stock</th>
-                    <th>dailyRentalRate</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
+
+
+  
+  
+    render() { 
+        const {movies,onDelete,onLike,onSort,sortColumn}=this.props
+        return (
+           
+            <table className="table">
+
+                <Table  onSort={onSort} sortColumn={sortColumn}
+                 columns={this.Columns} items={movies}
+                  onDelete={this.onDelete} onLike={this.onLike}/>
                
-                { movies.map(m=>(
-                 <tr key={m._id}>
-                 
-                 <td>{m.title}</td>
-
-                 <td>{m.genre.name}</td>
-
-                 
-                 <td>{m.numberInStock}</td>
-                <td>{m.dailyRentalRate}</td>
-                     <td><button onClick={()=>onDelete(m)} className="btn btn-danger">Delete</button></td>
-                     <td> <Like movie={m} onLike={onLike}/></td>
-
-                 </tr>   
-                ))
-                }
-
-            </tbody>
-        </table>
-     );
+               
+                
+            </table>
+         );    }
 }
+ 
+
+
+
  
 export default MoviesTable;

@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import MoviesTable from './MiviesTable';
 import { getMovies } from '../../services/fakeMovieService';
-import Pagination from '../Comon/pagination';
+import Pagination from '../Common/pagination';
 import Paginate from '../../Utility/Paging';
-import GroupList from '../Comon/GroupList';
+import GroupList from '../Common/GroupList';
 import { getGenres, genres } from '../../services/fakeGenreService';
+import _ from 'lodash'
 class Movies extends Component {
 
     state = { 
@@ -13,14 +14,15 @@ class Movies extends Component {
         curentPage:1,
         pageSize:3,
         curentGroupId:-1,
-        moviesCount:1
+        moviesCount:1,
+        sortCloumn:{path:"title",order:"asc"}
 
      }
      componentDidMount(){
         console.log("componentDidMount")
 
        let movies=getMovies();
-       let genres=getGenres();
+       let genres=[{_id:-1,name:"All"},...getGenres()];
      let  moviesCount=movies.length
         this.setState({movies:movies,genres,moviesCount})
 
@@ -36,7 +38,7 @@ class Movies extends Component {
 <GroupList curentGroupId={this.state.curentGroupId} items={this.state.genres} onGroupChang={this.handelGroupChang} />
 </div>
 <div className="col">
-<MoviesTable  movies={movies} onDelete={this.HandelDelete} onLike={this.HandelLike} />
+<MoviesTable onSort={this.handelSort} sortColumn={this.state.sortCloumn}  movies={movies} onDelete={this.HandelDelete} onLike={this.HandelLike} />
 </div>
 </div>
      
@@ -55,7 +57,6 @@ class Movies extends Component {
         this.setState({movies})
     }
     HandelLike=LikeItem=>{
-        debugger;
         let movies=[...this.state.movies]
        let index= movies.indexOf(LikeItem);
        movies[index].liked=!movies[index].liked
@@ -67,20 +68,24 @@ class Movies extends Component {
     }
     handelGroupChang=group=>{
        let curentGroupId=group._id;
-     let  moviesCount= getMovies().filter(m=>m.genre._id==curentGroupId).length
+       
+     let  moviesCount=curentGroupId==-1?getMovies().length: getMovies().filter(m=>m.genre._id==curentGroupId).length
         this.setState({curentGroupId,moviesCount,curentPage:1});
     }
+    handelSort=sortCloumn=>{
+
+        this.setState({sortCloumn})
+    }
     getData=()=>{
-       
-       let {pageSize,curentPage,movies,curentGroupId} =this.state; 
+       let {pageSize,curentPage,movies,curentGroupId,sortCloumn} =this.state; 
      if(curentGroupId!=-1){
          movies=movies.filter(m=>m.genre._id==curentGroupId);
      }
-   let  moviesCount=movies.length;
+ let sorted=_.orderBy(movies,[sortCloumn.path],[sortCloumn.order]);
      
 
-       let result= Paginate(curentPage,pageSize,movies);
-       console.log('result', result);
+       let result= Paginate(curentPage,pageSize,sorted);
+     
        
 
        return result;

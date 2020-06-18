@@ -5,10 +5,10 @@ const GroupList = props => {
     return ( 
 
         <React.Fragment>
-        <ul class="list-group">
+        <ul className="list-group">
 
 {        items.map(g=>(
-  <li onClick={()=>onGroupChang(g)} className={g._id==curentGroupId?"list-group-item active":"list-group-item"}>{g.name}</li>
+  <li key={g._id} onClick={()=>onGroupChang(g)} className={g._id===curentGroupId?"list-group-item active":"list-group-item"}>{g.name}</li>
 
 
         ))
