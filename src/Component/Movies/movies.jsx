@@ -6,6 +6,8 @@ import Paginate from '../../Utility/Paging';
 import GroupList from '../Common/GroupList';
 import { getGenres, genres } from '../../services/fakeGenreService';
 import _ from 'lodash'
+import SearchBox from '../Common/serchbox';
+import { Link } from 'react-router-dom';
 class Movies extends Component {
 
     state = { 
@@ -15,7 +17,8 @@ class Movies extends Component {
         pageSize:3,
         curentGroupId:-1,
         moviesCount:1,
-        sortCloumn:{path:"title",order:"asc"}
+        sortCloumn:{path:"title",order:"asc"},
+        search:""
 
      }
      componentDidMount(){
@@ -29,15 +32,25 @@ class Movies extends Component {
     }
     render() { 
        let movies =this.getData();
-
+    let  {search}=this.state;
      
         return (
             <React.Fragment>
-<div className="row">
+
+    
+<div className="row" style={{marginTop:10}} >
+
 <div className="col-3">
+    
 <GroupList curentGroupId={this.state.curentGroupId} items={this.state.genres} onGroupChang={this.handelGroupChang} />
 </div>
 <div className="col">
+<div className="row" style={{    direction: 'rtl',   marginBottom: 5,  marginRight: 15}}>
+<Link to={"movie/create"} className="btn btn-success ">create </Link>
+
+</div>
+<SearchBox value={search} onChange={this.handelSearchChange} />
+
 <MoviesTable onSort={this.handelSort} sortColumn={this.state.sortCloumn}  movies={movies} onDelete={this.HandelDelete} onLike={this.HandelLike} />
 </div>
 </div>
@@ -51,6 +64,13 @@ class Movies extends Component {
 
         
         );
+    }
+    handelSearchChange=({currentTarget:input})=>{
+       let {search}=this.state;
+       search=input.value;
+       let moviesCount=this.getMoviesCount(search,this.state.curentGroupId);
+       this.setState({search,moviesCount});
+
     }
     HandelDelete=DeleteItem=>{
       let  movies=[...this.state.movies.filter(m=>m._id!=DeleteItem._id)];
@@ -68,19 +88,39 @@ class Movies extends Component {
     }
     handelGroupChang=group=>{
        let curentGroupId=group._id;
+       let moviesCount=this.getMoviesCount(this.state.search,curentGroupId)
        
-     let  moviesCount=curentGroupId==-1?getMovies().length: getMovies().filter(m=>m.genre._id==curentGroupId).length
-        this.setState({curentGroupId,moviesCount,curentPage:1});
+        this.setState({curentGroupId,curentPage:1,moviesCount });
+
     }
+
+
+getMoviesCount(search,curentGroupId){
+    debugger;
+
+   
+    let  movies=!search? getMovies(): getMovies().filter(m=>m.title.indexOf(search)!==-1);
+    let  moviesCount=curentGroupId==-1?movies.length: movies.filter(m=>m.genre._id==curentGroupId).length
+
+  return moviesCount;
+
+}
+     
     handelSort=sortCloumn=>{
 
         this.setState({sortCloumn})
     }
     getData=()=>{
-       let {pageSize,curentPage,movies,curentGroupId,sortCloumn} =this.state; 
+       let {pageSize,curentPage,movies,curentGroupId,sortCloumn,search} =this.state; 
+       if(search)
+       {
+          movies=movies.filter(m=>m.title.indexOf(search)!==-1)
+       }
      if(curentGroupId!=-1){
          movies=movies.filter(m=>m.genre._id==curentGroupId);
      }
+    
+   
  let sorted=_.orderBy(movies,[sortCloumn.path],[sortCloumn.order]);
      
 

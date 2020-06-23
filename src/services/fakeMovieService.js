@@ -85,7 +85,7 @@ export function getMovie(id) {
 
 export function saveMovie(movie) {
   let movieInDb = movies.find(m => m._id === movie._id) || {};
-  movieInDb.name = movie.name;
+  movieInDb.name = movie.title;
   movieInDb.genre = genresAPI.genres.find(g => g._id === movie.genreId);
   movieInDb.numberInStock = movie.numberInStock;
   movieInDb.dailyRentalRate = movie.dailyRentalRate;
@@ -93,6 +93,7 @@ export function saveMovie(movie) {
   if (!movieInDb._id) {
     movieInDb._id = Date.now();
     movies.push(movieInDb);
+
   }
 
   return movieInDb;

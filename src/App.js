@@ -8,6 +8,8 @@ import Rental from './Component/Rental';
 import NavBar from './Component/Common/NavBar';
 import MovieForm from './Component/Movies/MovieForm';
 import Login from './Component/Login';
+import Register from './Component/register';
+import CreateMovie from './Component/Movies/CreateMovie';
 
 function App() {
   return (
@@ -21,6 +23,9 @@ function App() {
 
 <Switch>
   <Route component={Movies} path="/movies"/> 
+  <Route component={CreateMovie} path="/movie/create"/> 
+  <Route component={CreateMovie} path="/movie/edit/:id"/> 
+
   <Route component={Customer} path="/customers"/> 
   <Route component ={NotFound} path="/not-found" />
   
@@ -28,6 +33,7 @@ function App() {
   <Route component={MovieForm} path="/movie/:id" />
   <Route component={Login} path="/login" />
   <Redirect from="/" exact to="/movies" />
+  <Route component={Register} to="/register" />
   <Redirect to="/not-found"/>
 </Switch>
 
